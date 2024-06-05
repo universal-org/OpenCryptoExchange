@@ -7,8 +7,10 @@ import framesxTheme from './theme';
 import Intropage from "./intropage"
 import { CssVarsProvider, useColorScheme } from '@mui/joy/styles';
 import FAQ from "./FAQ"
+import Footer from './footer';
 
 export default function C() {
+
   return (
     <>
    
@@ -19,7 +21,7 @@ export default function C() {
 
 <CssVarsProvider disableTransitionOnChange theme={framesxTheme}>
       <CssBaseline />
-   
+      
       <Box
         sx={{
           height: '100vh',
@@ -30,6 +32,7 @@ export default function C() {
           },
         }}
       >
+     
         <Intropage />
         <div id="exchange">
         <Grid
@@ -63,6 +66,19 @@ export default function C() {
       <FAQ/>
       </Grid>
       </div>
+      
+      {/* <Grid
+  container
+  spacing={0}
+  direction="column"
+  alignItems="center"
+  justifyContent="center"
+  sx={{ minHeight: '100vh' }}
+> */}
+
+    
+      {/* </Grid> */}
+<Footer/>
       </Box>
     </CssVarsProvider>
 

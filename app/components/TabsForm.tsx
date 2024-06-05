@@ -15,7 +15,7 @@ import Grid from '@mui/joy/Grid';
 import Box from '@mui/joy/Box';
 import Radio from '@mui/joy/Radio';
 import RadioGroup from '@mui/joy/RadioGroup';
-
+import Link from 'next/link'
 export default function CountrySelect() {
   const [currency, setCurrency] = React.useState('inr');
   const [selected, setSelected] = React.useState('');
@@ -38,29 +38,21 @@ export default function CountrySelect() {
           autoComplete: 'new-password', // disable autocomplete and autofill
         },
       }}
-      // sx={{ width: 600 }}
+
       options={countries}
       autoHighlight
       getOptionLabel={(option) => option.code}
       renderOption={(props, option) => (
         <AutocompleteOption {...props}>
-          {/* <ListItemDecorator>
-            <img
-              loading="lazy"
-              width="20"
-              srcSet={`https://flagcdn.com/w40/${option.code.toLowerCase()}.png 2x`}
-              src={`https://flagcdn.com/w20/${option.code.toLowerCase()}.png`}
-              alt=""
-            />
-          </ListItemDecorator> */}
+      
           <ListItemContent sx={{ fontSize: 'xl' }}>
             <Typography level="title-lg">
-              {/* {option.label}  */}
+          
               {option.code}
            
             <Typography level="body-sm" sx={{ fontSize: 'xl' }}>
 
-              {/* ({option.code}) + */}
+        
               {option.phone}
             </Typography>
             </Typography>
@@ -260,8 +252,9 @@ export default function CountrySelect() {
        </Grid>
 
        <Grid xs={12}>
-
+       <Link href="/offers/buy">
        <Button size="lg" fullWidth>View offers</Button>
+       </Link>
     </Grid>
 
 

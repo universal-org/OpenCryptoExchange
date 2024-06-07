@@ -1,6 +1,21 @@
 "use client";
+import Textarea from '@mui/joy/Textarea';
+import Menu from '@mui/joy/Menu';
+import MenuItem from '@mui/joy/MenuItem';
+import ListItemDecorator from '@mui/joy/ListItemDecorator';
+import FormatBold from '@mui/icons-material/FormatBold';
+import FormatItalic from '@mui/icons-material/FormatItalic';
+import KeyboardArrowDown from '@mui/icons-material/KeyboardArrowDown';
+import Check from '@mui/icons-material/Check';
+import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import { useState, useEffect } from "react";
 import * as React from "react";
+import Modal from '@mui/joy/Modal';
+import ModalClose from '@mui/joy/ModalClose';
+import ModalDialog, { ModalDialogProps } from '@mui/joy/ModalDialog';
+import DialogTitle from '@mui/joy/DialogTitle';
+import DialogContent from '@mui/joy/DialogContent';
+import OpenInNewOutlinedIcon from "@mui/icons-material/OpenInNewOutlined";
 import Box from "@mui/joy/Box";
 import Sheet from "@mui/joy/Sheet";
 import Typography from "@mui/joy/Typography";
@@ -11,7 +26,6 @@ import Option from "@mui/joy/Option";
 import axios from "axios";
 import Stack from "@mui/joy/Stack";
 import Divider from "@mui/joy/Divider";
-import Input from "@mui/joy/Input";
 import Grid from "@mui/joy/Grid";
 import Avatar from "@mui/joy/Avatar";
 import Table from "@mui/joy/Table";
@@ -23,7 +37,7 @@ import Checkbox from "@mui/joy/Checkbox";
 import FormControl from "@mui/joy/FormControl";
 import FormLabel from "@mui/joy/FormLabel";
 import IconButton from "@mui/joy/IconButton";
-
+import StepIndicator from "@mui/joy/StepIndicator";
 import Tooltip from "@mui/joy/Tooltip";
 import DeleteIcon from "@mui/icons-material/Delete";
 import FilterListIcon from "@mui/icons-material/FilterList";
@@ -31,7 +45,77 @@ import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import { visuallyHidden } from "@mui/utils";
+import { styled } from "@mui/joy/styles";
+import Input from "@mui/joy/Input";
+import CheckCircleOutlined from "@mui/icons-material/CheckCircleOutlined";
+import Stepper from "@mui/joy/Stepper";
+import Step from "@mui/joy/Step";
+import Footer from "../footer";
+import MyMessages from "./components/MyMessages";
+const StyledInput = styled("input")({
+  border: "none", // remove the native input border
+  minWidth: 0, // remove the native input width
+  outline: 0, // remove the native input outline
+  padding: 0, // remove the native input padding
+  paddingTop: "1em",
+  flex: 1,
+  color: "inherit",
+  backgroundColor: "transparent",
+  fontFamily: "inherit",
+  fontSize: "inherit",
+  fontStyle: "inherit",
+  fontWeight: "inherit",
+  lineHeight: "inherit",
+  textOverflow: "ellipsis",
+  "&::placeholder": {
+    opacity: 0,
+    transition: "0.1s ease-out",
+  },
+  "&:focus::placeholder": {
+    opacity: 1,
+  },
+  "&:focus ~ label, &:not(:placeholder-shown) ~ label, &:-webkit-autofill ~ label":
+    {
+      top: "0.5rem",
+      fontSize: "0.75rem",
+    },
+  "&:focus ~ label": {
+    color: "var(--Input-focusedHighlight)",
+  },
+  "&:-webkit-autofill": {
+    alignSelf: "stretch", // to fill the height of the root slot
+  },
+  "&:-webkit-autofill:not(* + &)": {
+    marginInlineStart: "calc(-1 * var(--Input-paddingInline))",
+    paddingInlineStart: "var(--Input-paddingInline)",
+    borderTopLeftRadius:
+      "calc(var(--Input-radius) - var(--variant-borderWidth, 0px))",
+    borderBottomLeftRadius:
+      "calc(var(--Input-radius) - var(--variant-borderWidth, 0px))",
+  },
+});
 
+const StyledLabel = styled("label")(({ theme }) => ({
+  position: "absolute",
+  lineHeight: 1,
+  top: "calc((var(--Input-minHeight) - 1em) / 2)",
+  color: theme.vars.palette.text.tertiary,
+  fontWeight: theme.vars.fontWeight.md,
+  transition: "all 150ms cubic-bezier(0.4, 0, 0.2, 1)",
+}));
+
+const InnerInput = React.forwardRef<
+  HTMLInputElement,
+  JSX.IntrinsicElements["input"]
+>(function InnerInput(props, ref) {
+  const id = React.useId();
+  return (
+    <React.Fragment>
+      <StyledInput {...props} ref={ref} id={id} />
+      <StyledLabel htmlFor={id}>Currency Address</StyledLabel>
+    </React.Fragment>
+  );
+});
 
 // b
 interface Data {
@@ -396,24 +480,34 @@ export default function C() {
   const emptyRows =
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
   // c
-
   const [currency, setCurrency] = React.useState("inr");
+  const [currency1, setCurrency1] = React.useState("btc");
   // const [selected, setSelected] = React.useState("");
+  
   const [selected0, setSelected0] = React.useState("");
+  
+  const [size, setSize] = React.useState<ModalDialogProps['size'] | undefined>(
+    undefined,
+  );
+  const [italic, setItalic] = React.useState(false);
+  const [fontWeight, setFontWeight] = React.useState('normal');
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   return (
     <>
       <Box sx={{ m: 10 }}>
-        <Typography level="h1">BUY MONERO</Typography>
+        <Typography level="h1">CONTRACT TO BUY XMR</Typography>
 
-        <Typography level="body-lg">
-          Buy Monero from other users using any payment method and currency{" "}
+        {/* <Typography level="body-lg">
+          Buy Bitcoin from other users using any payment method and currency{" "}
           <Link sx={{ m: 5 }} href="#basics">
             How to start?{" "}
           </Link>
           <Button size="sm">Create offer</Button>
-        </Typography>
+        </Typography> */}
+        <Grid container spacing={2} sx={{ flexGrow: 1 }} >
+          <Grid sm={7} lg={7} xl={7}>
         <Sheet
-          variant="soft"
+          variant="plain"
           aria-label="Pricing plan"
           defaultValue={0}
           sx={{
@@ -427,7 +521,7 @@ export default function C() {
           color="neutral"
           //  sx={{ p: 4 }}
         >
-          <Grid container spacing={2} sx={{ flexGrow: 1 }}>
+          {/* <Grid container spacing={2} sx={{ flexGrow: 1 }}>
             <Grid xs={1.5}>
               <Select defaultValue="sfg1">
                 {options.map((option) => {
@@ -522,8 +616,8 @@ export default function C() {
                 <Option value="1">Clear all </Option>
               </Select>
             </Grid>
-          </Grid>
-
+          </Grid> */}
+          {/* ppip */}
           {/*  */}
           {/* <EnhancedTableToolbar numSelected={selected.length} />
           <Table
@@ -685,8 +779,8 @@ export default function C() {
             </tfoot>
           </Table> */}
           {/*  */}
-          <Table hoverRow>
-            <thead>
+          <Table>
+            {/* <thead>
               <tr>
                 <th>Seller</th>
                 <th>Price</th>
@@ -698,7 +792,7 @@ export default function C() {
                 </th>
                 <th>Offer details</th>
               </tr>
-            </thead>
+            </thead> */}
             {/* </Table>
       <Table
       aria-label="table with ellipsis texts"
@@ -713,22 +807,18 @@ export default function C() {
           </th>
         </tr>
       </thead> */}
+
             <tbody>
-              
-
-
-
-
               {datatable.map((option) => {
                 return (
                   <tr>
-                    <td>
+                    {/* <td>
                       <Box
                         sx={{ display: "flex", alignItems: "center", gap: 1.5 }}
                       >
                         <Avatar src="/static/images/avatar/1.jpg" />
                         <Box sx={{ minWidth: 0 }}>
-                          {/* <Typography noWrap fontWeight="lg" level="title-lg"> */}
+                       
                           <Typography
                             sx={{ fontSize: 23 }}
                             level="title-sm"
@@ -736,232 +826,332 @@ export default function C() {
                           >
                             {option.name}
                           </Typography>
-                          {/* <Typography noWrap level="body-sm"> */}
+                      
                           <Typography level="body-sm" noWrap>
                             {option.rate}% rate, {option.trades} trades
                           </Typography>
                         </Box>
                       </Box>
-                    </td>
+                    </td> */}
                     <td>
                       {" "}
-                      <Typography sx={{ fontSize: 28 }} level="title-md">
-                        {option.price} 
+                      <Typography sx={{ fontSize: 22 }} level="title-md">
+                        <Typography level="body-xs" sx={{ fontSize: 22 }}>
+                          {" "}
+                          Price{" "}
+                        </Typography>{" "}
+                        {option.price}
+                        <br />
+                        <Typography level="body-xs" sx={{ fontSize: 22 }}>
+                          {" "}
+                          Buy XMR{" "}
+                        </Typography>{" "}
+                        {option.BuyCrypto}
+                        <br />
+                        <Typography level="body-xs" sx={{ fontSize: 22 }}>
+                          {" "}
+                          Pay{" "}
+                        </Typography>{" "}
+                        {option.Pay}
                       </Typography>
-                    </td>
-                    <td>
-                      <Typography sx={{ fontSize: 23 }} level="title-sm">
+                      {/* </td>
+                    <td> */}
+                      {/* <Typography sx={{ fontSize: 23 }} level="title-sm">
                         {" "}
-                        {option.limitscurrency} {" "}
-                      </Typography>
+                        <Typography level="body-xs" sx={{ fontSize: 22 }}>
+                          {" "}
+                          Limits{" "}
+                        </Typography>
+                        {option.limitscurrency}{" "}
+                      </Typography> */}
                       {"\n"}
-                      <Typography level="body-md">
-                        {option.limitscrypto} 
-                      </Typography>
+                      {/* <Typography level="body-md">
+                        {option.limitscrypto}
+                      </Typography> */}
                     </td>
-                    <td>
-                      <Box
-                        sx={{
-                          display: "flex",
-                          mt: 2,
-                          gap: 1,
-                          alignItems: "center",
-                        }}
-                      >
-                        <div>
-                          <RadioGroup
-                            name="best-movie"
-                            aria-labelledby="best-movie"
-                            orientation="horizontal"
-                            sx={{ flexWrap: "wrap", gap: 1 }}
-                          >
-                            {[
-                              "Binance Coin (BNB)",
-                           
-                            ].map((name) => {
-                              // const checked = selected0 === name;
-                              return (
-                                <>
-                                  <Chip
-                                    style={{ size: "1rem" }}
-                                    key={name}
-                                    // variant="plain"
-                                   
-                                    startDecorator={  <Avatar size="sm" src={option.PaymentMethod1Avatar} />}
-                                    // startDecorator={
-                                    //   checked && <CheckIcon sx={{ zIndex: 1, pointerEvents: 'none' }} />
-                                    // }
-                                  >
-                                    <Radio
-                                                
-                                      variant="outlined"
-                                      
-                                      color={option.ColorPaymentMethord1}
-                                      disableIcon
-                                      overlay
-                                      label={option.PaymentMethod1}
-                                      value={name}
 
-                                      // onChange={(event) => {
-                                      //   if (event.target.checked) {
-                                      //     setSelected0(name);
-                                      //   }
-                                      // }}
-                                    />
-                                  </Chip>
-                                  <Chip
-                                    style={{ size: "1rem" }}
-                                    key={name}
-                                    startDecorator={<Avatar size="sm" src={option.PaymentMethod2Avatar} />}
-                                    variant="plain"
-                                    //  color={checked ? "primary" : "neutral"}
-                                    // startDecorator={
-                                    //   checked && <CheckIcon sx={{ zIndex: 1, pointerEvents: 'none' }} />
-                                    // }
-                                  >
-                                    <Radio
-                                      variant="outlined"
-                                      //  color={checked ? "primary" : "neutral"}
-                                      disableIcon
-                                      overlay
-                                      color={option.ColorPaymentMethord2}
-                                      label={option.PaymentMethod2}
-                                      value={name}
-                                      //  checked={checked}
-                                      //  onChange={(event) => {
-                                      //    if (event.target.checked) {
-                                      //      setSelected0(name);
-                                      //    }
-                                      //  }}
-                                    />
-                                  </Chip>
-                                  <Chip
-                                    style={{ size: "1rem" }}
-                                    key={name}
-                                    startDecorator={<Avatar size="sm" src={option.PaymentMethod3Avatar} />}
-                                    variant="plain"
-                                    //  color={checked ? "primary" : "neutral"}
-                                    // startDecorator={
-                                    //   checked && <CheckIcon sx={{ zIndex: 1, pointerEvents: 'none' }} />
-                                    // }
-                                  >
-                                    <Radio
-                                      variant="outlined"
-                                      //  color={checked ? "primary" : "neutral"}
-                                      disableIcon
-                                      overlay
-                                      color={option.ColorPaymentMethord3}
-                                      label={option.PaymentMethod3}
-                                      value={name}
-                                      //  checked={checked}
-                                      //  onChange={(event) => {
-                                      //    if (event.target.checked) {
-                                      //      setSelected0(name);
-                                      //    }
-                                      //  }}
-                                    />
-                                  </Chip>
-                                  <Chip
-                                    style={{ size: "1rem" }}
-                                    key={name}
-                                    variant="plain"
-                                    startDecorator={<Avatar size="sm" src={option.PaymentMethod4Avatar} />}
-                                    //  color={checked ? "primary" : "neutral"}
-                                    // startDecorator={
-                                    //   checked && <CheckIcon sx={{ zIndex: 1, pointerEvents: 'none' }} />
-                                    // }
-                                  >
-                                    <Radio
-                                      variant="outlined"
-                                      //  color={checked ? "primary" : "neutral"}
-                                      disableIcon
-                                      overlay
-                                      label={option.PaymentMethod4}
-                                      color={option.ColorPaymentMethord4}
-                                      value={name}
-                                      //  checked={checked}
-                                      //  onChange={(event) => {
-                                      //    if (event.target.checked) {
-                                      //      setSelected0(name);
-                                      //    }
-                                      //  }}
-                                    />
-                                  </Chip>
-                                  <Chip
-                                    style={{ size: "1rem" }}
-                                    key={name}
-                                    variant="plain"
-                                    startDecorator={<Avatar size="sm" src={option.PaymentMethod5Avatar} />}
-                                    //  color={checked ? "primary" : "neutral"}
-                                    // startDecorator={
-                                    //   checked && <CheckIcon sx={{ zIndex: 1, pointerEvents: 'none' }} />
-                                    // }
-                                  >
-                                    <Radio
-                                      variant="outlined"
-                                      //  color={checked ? "primary" : "neutral"}
-                                      disableIcon
-                                      overlay
-                                      label={option.PaymentMethod5}
-                                      color={option.ColorPaymentMethord5}
-                                      value={name}
-                                      //  checked={checked}
-                                      //  onChange={(event) => {
-                                      //    if (event.target.checked) {
-                                      //      setSelected0(name);
-                                      //    }
-                                      //  }}
-                                    />
-                                  </Chip>
-                                  <Chip
-                                    style={{ size: "1rem" }}
-                                    key={name}
-                                    variant="plain"
-                                    //  color={checked ? "primary" : "neutral"}
-                                    // startDecorator={
-                                    //   checked && <CheckIcon sx={{ zIndex: 1, pointerEvents: 'none' }} />
-                                    // }
-                                  >
-                                    <Radio
-                                      variant="outlined"
-                                      //  color={checked ? "primary" : "neutral"}
-                                      disableIcon
-                                      overlay
-                                      label={option.PaymentMethodsNo}
-                                      color={option.ColorPaymentMethordsNo}
-                                      value={name}
-                                      //  checked={checked}
-                                      //  onChange={(event) => {
-                                      //    if (event.target.checked) {
-                                      //      setSelected0(name);
-                                      //    }
-                                      //  }}
-                                    />
-                                  </Chip>
-                                </>
-                              );
-                            })}
-                          </RadioGroup>
-                        </div>
-                      </Box>
-                    </td>
                     <td>
                       {" "}
                       <Typography level="body-md">
-                        {" "}
-                        {option.offer}
-                  
+                        <Typography level="body-xs" sx={{ fontSize: 22 }}>
+                          {" "}
+                          Location{" "}
+                        </Typography>
+                        {option.Location} <br />
+                        <Typography level="body-xs" sx={{ fontSize: 22 }}>
+                          {" "}
+                          Payment window{" "}
+                          <Tooltip
+                            placement="top-start"
+                            variant="solid"
+                            arrow
+                            title={
+                              <Box
+                                sx={{
+                                  display: "flex",
+                                  flexDirection: "column",
+                                  maxWidth: 320,
+                                  justifyContent: "center",
+                                  p: 1,
+                                }}
+                              >
+                                <Box
+                                  sx={{
+                                    display: "flex",
+                                    // gap: 1,
+                                    width: "100%",
+                                    mt: 1,
+                                  }}
+                                >
+                                  <div>
+                                    <Typography sx={{ fontSize: 15, mb: 1 }}>
+                                      The payment window is the time within
+                                      which the Buyer must complete the payment.
+                                      The timeframe must reflect the selected
+                                      payment method. When the payment window
+                                      runs out, the Seller can cancel the
+                                      contract or start the dispute if the
+                                      payment has been initiated but not
+                                      received.
+                                    </Typography>
+                                  </div>
+                                </Box>
+                              </Box>
+                            }
+                          >
+                            <HelpOutlineIcon
+                              fontSize="inherit"
+                              color="primary"
+                            />
+                          </Tooltip>
+                        </Typography>
+                        {/* <Tooltip
+                          size="sm"
+                          arrow
+                          open
+                          title="The payment window is the time within which  the Buyer must complete the payment. The timeframe must reflect the selected payment method. When the payment window runs out, the Seller can cancel the contract or start the dispute if the payment has been initiated but not received."
+                          variant="solid"
+                          placement="top-end"
+                        >
+                          <HelpOutlineIcon fontSize="inherit" color="primary" />
+                        </Tooltip> */}
+                        {option.paymentwindow} min.
+                        <br />
+                        <Typography level="body-xs" sx={{ fontSize: 22 }}>
+                          {" "}
+                          XMR confirmations
+                        </Typography>{" "}
+                        1 <br />
+                        <Typography level="body-xs" sx={{ fontSize: 22 }}>
+                          {" "}
+                          Payment method{" "}
+                          <Chip
+                            variant="outlined"
+                            color={option.ColorPaymentMethodSelected}
+                          >
+                            {option.PaymentMethodSelected}
+                          </Chip>
+                        </Typography>
                       </Typography>
+                    </td>
+                    
+                    <td>
+                      <Sheet
+                        variant="soft"
+                        aria-label="Pricing plan"
+                        defaultValue={0}
+                        style={{ whiteSpace: "pre-wrap" }}
+                        sx={{
+                          //    width: 750,
+                          borderRadius: "lg",
+                          // boxShadow: "xl",
+                          overflow: "auto",
+                          mt: 3,
+                          p: 4,
+                        }}
+                        color="neutral"
+                        //  sx={{ p: 4 }}
+                      >
+                        <Typography
+                          level="body-md"
+                          sx={{ wordBreak: "break-word" }}
+                        >
+                          {" "}
+                          Monero release address
+                          {/* {option.offer} */}
+                          <Link>
+                            <div
+                              style={{
+                                display: "inline-block",
+                                whiteSpace: "pre-line",
+                              }}
+                            >
+                              {option.CryptoCurrencyAddress}{" "}
+                            </div>
+                            <OpenInNewOutlinedIcon />
+                          </Link>
+                        </Typography>
+                      </Sheet>
                     </td>
                   </tr>
                 );
               })}
-             
             </tbody>
           </Table>
-          <Pig />
         </Sheet>
+
+        <Sheet
+          variant="plain"
+          aria-label="Pricing plan"
+          defaultValue={0}
+          sx={{
+            //    width: 750,
+            borderRadius: "lg",
+            boxShadow: "xl",
+            overflow: "auto",
+            mt: 3,
+            p: 4,
+          }}
+          color="neutral"
+          //  sx={{ p: 4 }}
+        >
+          <Typography level="title-xs">Engaging in contract</Typography>
+              <Typography level="body-md">Generate a multisig escrow address by confirming your payment password.</Typography>
+          
+
+
+              <Sheet
+          variant="soft"
+          aria-label="Pricing plan"
+          defaultValue={0}
+          sx={{
+            //    width: 750,
+            borderRadius: "lg",
+            // boxShadow: "xl",
+            overflow: "auto",
+            mt: 3,
+            p: 4,
+          }}
+          color="neutral"
+          //  sx={{ p: 4 }}
+        >
+          <Stack direction="row">
+            <Box sx={{m:1}}>
+<Typography level="body-sm">Price per XMR</Typography>
+<Typography level="title-sm">N/A USD</Typography>
+</Box>
+<Box sx={{m:1}}>
+<Typography level="body-sm">XMR to buy</Typography>
+<Typography level="title-sm">N/A</Typography>
+</Box>
+<Box sx={{m:1}}>
+<Typography level="body-sm">Amount to pay</Typography>
+<Typography level="title-sm">40,000.01 USD</Typography>
+</Box>
+</Stack>
+</Sheet>
+<Typography level="title-sm">
+<Button  sx={{mt:2}} size="lg">Accept contract</Button>
+<Button sx={{m:2}}  size="lg"onClick={() => setSize('lg')}  variant="outlined" color="danger">Reject contract</Button>
+</Typography>
+
+<Modal open={!!size} onClose={() => setSize(undefined)}>
+        <ModalDialog size="sm">
+          <ModalClose />
+          <DialogTitle>
+            {/* <Typography level="title-sm">  */}
+          Are you sure you want to cancel this contract?
+          {/* </Typography> */}
+          </DialogTitle>
+          <DialogContent sx={{mt:1,}}><Typography level="body-md"> Please be respectful of your counterparty and avoid canceling the contract without an apparent reason. We carefully monitor canceled contracts. Excessive cancellations can result in the suspension of your account.</Typography></DialogContent>
+          <DialogContent sx={{mt:1,}}><Typography level="body-md"> Amount to be sent 40,000.01 USD</Typography></DialogContent>
+          <DialogContent sx={{mt:1,}}>
+          <Typography level="title-sm">
+<Button  sx={{mt:2}} size="lg" color="danger">Cancel contract</Button>
+<Button sx={{m:2}}  size="lg"  variant="outlined"  color="neutral">Back to contract</Button>
+</Typography>
+          </DialogContent>
+        </ModalDialog>
+      </Modal>
+
+      </Sheet>
+      </Grid>
+      <Grid sm={5} md={5} xl={5} lg={5}>
+      <Sheet
+          variant="plain"
+          aria-label="Pricing plan"
+          defaultValue={0}
+          sx={{
+            //    width: 750,
+            borderRadius: "lg",
+            boxShadow: "xl",
+            overflow: "auto",
+            mt: 3,
+            p: 4,
+          }}
+          color="neutral"
+          //  sx={{ p: 4 }}
+        >
+
+
+<Box component="main" className="MainContent" sx={{ flex: 1 }}>
+          <MyMessages />
+        </Box>
+            </Sheet>
+    </Grid>
+
+            </Grid>
+          <Stepper sx={{ mt: 4 }}>
+            <Step
+              orientation="vertical"
+              indicator={
+                <StepIndicator variant="solid" color="primary">
+                  1
+                </StepIndicator>
+              }
+            >
+              {" "}
+              <Typography style={{ color: "#1565c0" }}>
+                You are accepting an offer{" "}
+              </Typography>
+            </Step>
+            <Step
+              orientation="vertical"
+              indicator={
+                <StepIndicator variant="solid" color="primary">
+                  2
+                </StepIndicator>
+              }
+            >
+              {" "}
+              <Typography style={{ color: "#1565c0" }}>
+                You are engaging in contract, generate escrow address by
+                confirming your payment password
+              </Typography>
+            </Step>
+            <Step
+              orientation="vertical"
+              indicator={<StepIndicator variant="outlined">3</StepIndicator>}
+            >
+              The Seller deposits Monero in the multisig escrow
+            </Step>
+            <Step
+              orientation="vertical"
+              indicator={<StepIndicator variant="outlined">4</StepIndicator>}
+            >
+              The Buyer sends the payment to the Seller
+            </Step>
+            <Step
+              orientation="vertical"
+              indicator={<StepIndicator variant="outlined">5</StepIndicator>}
+            >
+              Contract is completed, the Buyer receives the Monero
+            </Step>
+          </Stepper>
+        
+
       </Box>
+      <Footer />
     </>
   );
 }
@@ -1485,158 +1675,102 @@ const datatable = [
     trades: 195,
     price: "70507.19 USD",
     limitscurrency: "2,000 - 150,000 USD",
-    limitscrypto: "0.02836590 - 2.12744270 XMR",
+    limitscrypto: "0.02836590 - 2.12744270 BTC",
     PaymentMethod1: "Binance Coin (BNB)",
+    ColorPaymentMethord1: "warning",
+    ColorPaymentMethord2: "primary",
+    ColorPaymentMethord3: "warning",
+    ColorPaymentMethord4: "success",
+    ColorPaymentMethord5: "warning",
+    ColorPaymentMethordsNo: "warning",
     PaymentMethod2: "Ethereum",
     PaymentMethod3: "DAI",
     PaymentMethod4: "Tether",
     PaymentMethod5: "Binance USD (BUSD)",
     PaymentMethodsNo: "+3",
     offer: "NO KYC‼️Notifications On - 24/7 ✅",
-    ColorPaymentMethord1:"warning",
-    ColorPaymentMethord2:"primary",
-    ColorPaymentMethord3:"warning",
-    ColorPaymentMethord4:"success",
-    ColorPaymentMethord5:"warning",
-    ColorPaymentMethordsNo:"warning",
-    PaymentMethod1Avatar: "/binance.svg",
-    PaymentMethod2Avatar: "/eth.svg",
-    PaymentMethod3Avatar: "/dai.svg",
-    PaymentMethod4Avatar: "/the.svg",
-    PaymentMethod5Avatar: "/binance.svg",
-    
-  },{
-  id:2 ,
-  name: "alexender",
-  rate:100 ,
-  trades:64 ,
-  price:"69,108.22 USD" ,
-  limitscurrency: "1,000 - 67,777 USD",
-  limitscrypto: "0.01447006 - 0.98073710 XMR",
-  PaymentMethod1: "PayPal",
-  PaymentMethod2: "Any national bank",
-  PaymentMethod3: "Google pay",
-  PaymentMethod4: "Amazon pay",
-  PaymentMethod5: "Paytm",
-  PaymentMethodsNo: "+6",
-  ColorPaymentMethord1:"primary",
-  ColorPaymentMethord2:"primary",
-  ColorPaymentMethord3:"neutral",
-  ColorPaymentMethord4:"neutral",
-  ColorPaymentMethord5:"primary",
-  ColorPaymentMethordsNo:"warning",
-  offer: "If I don't respond for more than 2 minutes contact me at tg OTCPlatform where I respond instantly. ",
-  PaymentMethod1Avatar: "/paypal.svg",
-  PaymentMethod2Avatar: "/bank.svg",
-  PaymentMethod3Avatar: "/gpay.svg",
-  PaymentMethod4Avatar: "/amazonpay.svg",
-  PaymentMethod5Avatar: "/paytm.svg",
-},{
-  id:3 ,
-  name: "jajafk",
-  rate:100 ,
-  trades: 537,
-  price:"69,733.75 USD" ,
-  limitscurrency: "700 - 50,000 USD",
-  limitscrypto: "0.01003818 - 0.71701294 XMR",
-  PaymentMethod1: "Binance",
-  PaymentMethod2: "Ethereum",
-  PaymentMethod3: "Bitcoin Cash",
-  PaymentMethod4: "Tether",
-  PaymentMethod5: "Binance USD",
-  PaymentMethodsNo: "+9",
-  ColorPaymentMethord1:"warning",
-  ColorPaymentMethord2:"primary",
-  ColorPaymentMethord3:"warning",
-  ColorPaymentMethord4:"success",
-  ColorPaymentMethord5:"warning",
-  ColorPaymentMethordsNo:"warning",
-  PaymentMethod1Avatar: "/binance.svg",
-  PaymentMethod2Avatar: "/eth.svg",
-  PaymentMethod3Avatar: "/dai.svg",
-  PaymentMethod4Avatar: "/the.svg",
-  PaymentMethod5Avatar: "/binance.svg",
-  offer: "XMR ETH SOL USDT USDC and any other coin!!",
-},   {
-  id: 4,
-  name: "chickenwing",
-  rate: 100,
-  trades: 195,
-  price: "70507.19 USD",
-  limitscurrency: "2,000 - 150,000 USD",
-  limitscrypto: "0.02836590 - 2.12744270 XMR",
-  PaymentMethod1: "Binance Coin (BNB)",
-  PaymentMethod2: "Ethereum",
-  PaymentMethod3: "DAI",
-  PaymentMethod4: "Tether",
-  PaymentMethod5: "Binance USD (BUSD)",
-  PaymentMethodsNo: "+3",
-  offer: "NO KYC‼️Notifications On - 24/7 ✅",
-  ColorPaymentMethord1:"warning",
-  ColorPaymentMethord2:"primary",
-  ColorPaymentMethord3:"warning",
-  ColorPaymentMethord4:"success",
-  ColorPaymentMethord5:"warning",
-  ColorPaymentMethordsNo:"warning",
-  PaymentMethod1Avatar: "/binance.svg",
-  PaymentMethod2Avatar: "/eth.svg",
-  PaymentMethod3Avatar: "/dai.svg",
-  PaymentMethod4Avatar: "/the.svg",
-  PaymentMethod5Avatar: "/binance.svg",
-  
-},{
-id:5 ,
-name: "alexender",
-rate:100 ,
-trades:64 ,
-price:"69,108.22 USD" ,
-limitscurrency: "1,000 - 67,777 USD",
-limitscrypto: "0.01447006 - 0.98073710 XMR",
-PaymentMethod1: "PayPal",
-PaymentMethod2: "Any national bank",
-PaymentMethod3: "Google pay",
-PaymentMethod4: "Amazon pay",
-PaymentMethod5: "Paytm",
-PaymentMethodsNo: "+6",
-ColorPaymentMethord1:"primary",
-ColorPaymentMethord2:"primary",
-ColorPaymentMethord3:"neutral",
-ColorPaymentMethord4:"neutral",
-ColorPaymentMethord5:"primary",
-ColorPaymentMethordsNo:"warning",
-offer: "If I don't respond for more than 2 minutes contact me at tg OTCPlatform where I respond instantly. ",
-PaymentMethod1Avatar: "/paypal.svg",
-PaymentMethod2Avatar: "/bank.svg",
-PaymentMethod3Avatar: "/gpay.svg",
-PaymentMethod4Avatar: "/amazonpay.svg",
-PaymentMethod5Avatar: "/paytm.svg",
-},{
-id:6,
-name: "jajafk",
-rate:100 ,
-trades: 537,
-price:"69,733.75 USD" ,
-limitscurrency: "700 - 50,000 USD",
-limitscrypto: "0.01003818 - 0.71701294 XMR",
-PaymentMethod1: "Binance",
-PaymentMethod2: "Ethereum",
-PaymentMethod3: "Bitcoin Cash",
-PaymentMethod4: "Tether",
-PaymentMethod5: "Binance USD",
-PaymentMethodsNo: "+9",
-ColorPaymentMethord1:"warning",
-ColorPaymentMethord2:"primary",
-ColorPaymentMethord3:"warning",
-ColorPaymentMethord4:"success",
-ColorPaymentMethord5:"warning",
-ColorPaymentMethordsNo:"warning",
-PaymentMethod1Avatar: "/binance.svg",
-PaymentMethod2Avatar: "/eth.svg",
-PaymentMethod3Avatar: "/dai.svg",
-PaymentMethod4Avatar: "/the.svg",
-PaymentMethod5Avatar: "/binance.svg",
-offer: "XMR ETH SOL USDT USDC and any other coin!!",
-},
-
-
+    Location: "Global",
+    paymentwindow: 80,
+    CryptoCurrencyAddress: "46ZKbR2NAVnjp6zqpbGLuEEKf4xjNYGLvfny2gsCSbznKd3krjHxJAzMBiXJt665iF44NBarc9wDt4YB77os61PJ9qNhKsK",
+    BuyCrypto: "0.00583834 XMR",
+    Pay: "40,000.01 INR",
+    PaymentMethodSelected: "UPI",
+    ColorPaymentMethodSelected: "warning",
+  },
+  //   },{
+  //   id:2 ,
+  //   name: "alexender",
+  //   rate:100 ,
+  //   trades:64 ,
+  //   price:"69,108.22 USD" ,
+  //   limitscurrency: "1,000 - 67,777 USD",
+  //   limitscrypto: "0.01447006 - 0.98073710 BTC",
+  //   PaymentMethod1: "PayPal",
+  //   PaymentMethod2: "Any national bank",
+  //   PaymentMethod3: "Google pay",
+  //   PaymentMethod4: "Amazon pay",
+  //   PaymentMethod5: "Paytm",
+  //   PaymentMethodsNo: "+6",
+  //   offer: "If I don't respond for more than 2 minutes contact me at tg OTCPlatform where I respond instantly. ",
+  // },{
+  //   id:3 ,
+  //   name: "jajafk",
+  //   rate:100 ,
+  //   trades: 537,
+  //   price:"69,733.75 USD" ,
+  //   limitscurrency: "700 - 50,000 USD",
+  //   limitscrypto: "0.01003818 - 0.71701294 BTC",
+  //   PaymentMethod1: "TRON",
+  //   PaymentMethod2: "Cardano",
+  //   PaymentMethod3: "Bitcoin Cash",
+  //   PaymentMethod4: "Binance Coin (BNB)",
+  //   PaymentMethod5: "Dogecoin",
+  //   PaymentMethodsNo: "+9",
+  //   offer: "XMR ETH SOL USDT USDC and any other coin!!",
+  // }, {
+  //   id: 4,
+  //   name: "chickenwing",
+  //   rate: 100,
+  //   trades: 195,
+  //   price: "70507.19 USD",
+  //   limitscurrency: "2,000 - 150,000 USD",
+  //   limitscrypto: "0.02836590 - 2.12744270 BTC",
+  //   PaymentMethod1: "Binance Coin (BNB)",
+  //   PaymentMethod2: "Ethereum",
+  //   PaymentMethod3: "DAI",
+  //   PaymentMethod4: "Tether",
+  //   PaymentMethod5: "Binance USD (BUSD)",
+  //   PaymentMethodsNo: "+3",
+  //   offer: "NO KYC‼️Notifications On - 24/7 ✅",
+  // },{
+  // id:5 ,
+  // name: "alexender",
+  // rate:100 ,
+  // trades:64 ,
+  // price:"69,108.22 USD" ,
+  // limitscurrency: "1,000 - 67,777 USD",
+  // limitscrypto: "0.01447006 - 0.98073710 BTC",
+  // PaymentMethod1: "PayPal",
+  // PaymentMethod2: "Any national bank",
+  // PaymentMethod3: "Google pay",
+  // PaymentMethod4: "Amazon pay",
+  // PaymentMethod5: "Paytm",
+  // PaymentMethodsNo: "+6",
+  // offer: "If I don't respond for more than 2 minutes contact me at tg OTCPlatform where I respond instantly. ",
+  // },{
+  // id:6 ,
+  // name: "jajafk",
+  // rate:100 ,
+  // trades: 537,
+  // price:"69,733.75 USD" ,
+  // limitscurrency: "700 - 50,000 USD",
+  // limitscrypto: "0.01003818 - 0.71701294 BTC",
+  // PaymentMethod1: "TRON",
+  // PaymentMethod2: "Cardano",
+  // PaymentMethod3: "Bitcoin Cash",
+  // PaymentMethod4: "Binance Coin (BNB)",
+  // PaymentMethod5: "Dogecoin",
+  // PaymentMethodsNo: "+9",
+  // offer: "XMR ETH SOL USDT USDC and any other coin!!",
+  // }
 ];

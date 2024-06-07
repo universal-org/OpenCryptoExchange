@@ -97,7 +97,7 @@ const InnerInput = React.forwardRef<
   return (
     <React.Fragment>
       <StyledInput {...props} ref={ref} id={id} />
-      <StyledLabel htmlFor={id}>Crypto Currency Address</StyledLabel>
+      <StyledLabel htmlFor={id}>Currency Address</StyledLabel>
     </React.Fragment>
   );
 });
@@ -465,14 +465,14 @@ export default function C() {
   const emptyRows =
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
   // c
-  const [currency, setCurrency] = React.useState("inr");
-  const [currency1, setCurrency1] = React.useState("btc");
+  const [currency, setCurrency] = React.useState("usd");
+  const [currency1, setCurrency1] = React.useState("xmr");
   // const [selected, setSelected] = React.useState("");
   const [selected0, setSelected0] = React.useState("");
   return (
     <>
       <Box sx={{ m: 10 }}>
-        <Typography level="h1">OFFER TO BUY BITCOIN</Typography>
+        <Typography level="h1">OFFER TO BUY MONERO</Typography>
 
         {/* <Typography level="body-lg">
           Buy Bitcoin from other users using any payment method and currency{" "}
@@ -1133,17 +1133,17 @@ export default function C() {
         >
           <Grid container  spacing={2} sx={{ flexGrow: 1 }}>
             <Grid xs={6} md={6} lg={6} xl={6}>
-              <Typography level="body-xs">I want to buy BTC for</Typography>
-              <Stack spacing={1} direction="column">
-              <FormControl
+              <Typography level="body-xs">I want to buy XMR for</Typography>
+              <Stack spacing={0} direction="row">
+              {/* <FormControl
                 sx={{ display: { sm: 'flex-column', md: 'flex-row' }, gap: 2 }}
-                >
+                > */}
                   {/* <Stack spacing={1.5}> */}
                     <Input
                       type="number"
                       placeholder="Amount"
                       startDecorator={
-                        { inr: " ₹", dollar: "$", eur: "€", yen: "¥" }[currency]
+                        { inr: " ₹", usd: "$", eur: "€", yen: "¥" }[currency]
                       }
                       endDecorator={
                         <React.Fragment>
@@ -1163,7 +1163,7 @@ export default function C() {
                             }}
                           >
                             <Option value="inr">INR</Option>
-                            <Option value="dollar">USD</Option>
+                            <Option value="usd">USD</Option>
                             <Option value="eur">EUR</Option>
                             <Option value="yen">YEN</Option>
                           </Select>
@@ -1176,6 +1176,7 @@ export default function C() {
             <Typography>=</Typography></Grid> */}
          
                   {/* <Stack spacing={1.5}> */}
+                  <Typography sx={{m:1}} level="title-sm">=</Typography>
                     <Input
                       placeholder="Amount"
                       type="number"
@@ -1218,12 +1219,12 @@ export default function C() {
                       // sx={{ width: 600 }}
                     />
                   {/* </Stack> */}
-                  </FormControl>
+                  {/* </FormControl> */}
                   </Stack>
               <Typography sx={{mt:1}} level="body-xs">
                 Enter the amount you are looking to buy
               </Typography>
-              <Typography sx={{mt:2}} level="body-xs"> Bitcoin address</Typography>
+              <Typography sx={{mt:2}} level="body-xs"> Monero address</Typography>
               <Input
                 endDecorator={<CheckCircleOutlined />}
                 slots={{ input: InnerInput }}
@@ -1273,7 +1274,7 @@ export default function C() {
                 <Typography level="body-xs"> Amount to buy </Typography>
                 <Typography sx={{ mb: 2 }} level="title-md">
                   {" "}
-                  0 BTC ≈ 0 INR{" "}
+                  0 XMR ≈ 0 USD{" "}
                 </Typography>
                 <Divider />
                 <Typography sx={{ mt: 2 }} level="body-xs">
@@ -1284,7 +1285,7 @@ export default function C() {
                   {" "}
                  <Chip  size="sm"
         variant="solid"
-        color="warning">FEE 0%</Chip> 0 BTC ≈ 0 INR
+        color="warning">FEE 0%</Chip> 0 XMR ≈ 0 USD
                 </Typography>
                 <Divider />
                 <Typography sx={{ mt: 2 }} level="body-xs">
@@ -1293,7 +1294,7 @@ export default function C() {
                 </Typography>
                 <Typography sx={{ mb: 2 }} level="title-md">
                   {" "}
-                  0 BTC ≈ 0 INR
+                  0 XMR ≈ 0 USD
                 </Typography>
                 <Divider />
                 <Typography sx={{ mt: 2 }} level="body-xs">
@@ -1304,7 +1305,7 @@ export default function C() {
                   {" "}
                   <Chip size="sm"
         variant="solid"
-        color="warning">FEE 0%</Chip> 0 BTC ≈ 0 INR
+        color="warning">FEE 0%</Chip> 0 XMR ≈ 0 USD
                 </Typography>
                 <Divider />
                 <Typography sx={{ mt: 2 }} level="body-xs">
@@ -1313,7 +1314,7 @@ export default function C() {
                 <Typography level="title-md">
                 <Chip  size="sm"
         variant="solid"
-        color="success">Low </Chip> 0.00011616 BTC ≈0 INR{" "}
+        color="success">Low </Chip> 0.00011616 XMR ≈0 USD{" "}
                 </Typography>
               </Sheet>
             </Grid>
@@ -1344,7 +1345,7 @@ export default function C() {
               orientation="vertical"
               indicator={<StepIndicator variant="outlined">3</StepIndicator>}
             >
-              The Seller deposits Bitcoin in the multisig escrow
+              The Seller deposits Monero in the multisig escrow
             </Step>
             <Step
               orientation="vertical"
@@ -1356,7 +1357,7 @@ export default function C() {
               orientation="vertical"
               indicator={<StepIndicator variant="outlined">5</StepIndicator>}
             >
-              Contract is completed, the Buyer receives the Bitcoin
+              Contract is completed, the Buyer receives the Monero
             </Step>
           </Stepper>
         </Sheet>
@@ -1885,7 +1886,7 @@ const datatable = [
     trades: 195,
     price: "70507.19 USD",
     limitscurrency: "2,000 - 150,000 USD",
-    limitscrypto: "0.02836590 - 2.12744270 BTC",
+    limitscrypto: "0.02836590 - 2.12744270 XMR",
     PaymentMethod1: "Binance Coin (BNB)",
     ColorPaymentMethord1:"warning",
     ColorPaymentMethord2:"primary",

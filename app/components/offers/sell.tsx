@@ -6,10 +6,9 @@ import Box from "@mui/joy/Box";
 import Button from '@mui/joy/Button';
 import Sheet from "@mui/joy/Sheet";
 import Typography from "@mui/joy/Typography";
-// import Link from "@mui/joy/Link";
+import JoyLink from "@mui/joy/Link";
 import Select from "@mui/joy/Select";
 import Option from "@mui/joy/Option";
-import axios from "axios";
 import Stack from "@mui/joy/Stack";
 import Divider from "@mui/joy/Divider";
 import Input from "@mui/joy/Input";
@@ -34,369 +33,9 @@ import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import { visuallyHidden } from "@mui/utils";
 
 
-// b
-interface Data {
-  calories: number;
-  carbs: number;
-  fat: number;
-  name: string;
-  protein: number;
-}
-
-function createData(
-  name: string,
-  calories: number,
-  fat: number,
-  carbs: number,
-  protein: number
-): Data {
-  return {
-    name,
-    calories,
-    fat,
-    carbs,
-    protein,
-  };
-}
-
-const rows = [
-  createData("chickenwing", 305, 3.7, 67, 4.3),
-  createData("Donut", 452, 25.0, 51, 4.9),
-  createData("Eclair", 262, 16.0, 24, 6.0),
-  createData("Frozen yoghurt", 159, 6.0, 24, 4.0),
-  createData("Gingerbread", 356, 16.0, 49, 3.9),
-  createData("Honeycomb", 408, 3.2, 87, 6.5),
-  createData("Ice cream sandwich", 237, 9.0, 37, 4.3),
-  createData("Jelly Bean", 375, 0.0, 94, 0.0),
-  createData("KitKat", 518, 26.0, 65, 7.0),
-  createData("Lollipop", 392, 0.2, 98, 0.0),
-  createData("Marshmallow", 318, 0, 81, 2.0),
-  createData("Nougat", 360, 19.0, 9, 37.0),
-  createData("Oreo", 437, 18.0, 63, 4.0),
-];
-
-function labelDisplayedRows({
-  from,
-  to,
-  count,
-}: {
-  from: number;
-  to: number;
-  count: number;
-}) {
-  return `${from}–${to} of ${count !== -1 ? count : `more than ${to}`}`;
-}
-
-function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
-  if (b[orderBy] < a[orderBy]) {
-    return -1;
-  }
-  if (b[orderBy] > a[orderBy]) {
-    return 1;
-  }
-  return 0;
-}
-
-type Order = "asc" | "desc";
-
-function getComparator<Key extends keyof any>(
-  order: Order,
-  orderBy: Key
-): (
-  a: { [key in Key]: number | string },
-  b: { [key in Key]: number | string }
-) => number {
-  return order === "desc"
-    ? (a, b) => descendingComparator(a, b, orderBy)
-    : (a, b) => -descendingComparator(a, b, orderBy);
-}
-
-// Since 2020 all major browsers ensure sort stability with Array.prototype.sort().
-// stableSort() brings sort stability to non-modern browsers (notably IE11). If you
-// only support modern browsers you can replace stableSort(exampleArray, exampleComparator)
-// with exampleArray.slice().sort(exampleComparator)
-function stableSort<T>(
-  array: readonly T[],
-  comparator: (a: T, b: T) => number
-) {
-  const stabilizedThis = array.map((el, index) => [el, index] as [T, number]);
-  stabilizedThis.sort((a, b) => {
-    const order = comparator(a[0], b[0]);
-    if (order !== 0) {
-      return order;
-    }
-    return a[1] - b[1];
-  });
-  return stabilizedThis.map((el) => el[0]);
-}
-
-interface HeadCell {
-  disablePadding: boolean;
-  id: keyof Data;
-  label: string;
-  numeric: boolean;
-}
-
-const headCells: readonly HeadCell[] = [
-  // {
-  //   id: "name",
-  //   numeric: false,
-  //   disablePadding: true,
-  //   label: "Desser",
-  // },
-  {
-    id: "calories",
-    numeric: true,
-    disablePadding: false,
-    label: "Price",
-  },
-  {
-    id: "fat",
-    numeric: true,
-    disablePadding: false,
-    label: "Limits",
-  },
-  // {
-  //   id: "carbs",
-  //   numeric: false,
-  //   disablePadding: false,
-  //   label: "Carbs (g)",
-  // },
-  // {
-  //   id: "protein",
-  //   numeric: true,
-  //   disablePadding: false,
-  //   label: "Protein (g)",
-  // },
-];
-
-interface EnhancedTableProps {
-  numSelected: number;
-  onRequestSort: (
-    event: React.MouseEvent<unknown>,
-    property: keyof Data
-  ) => void;
-  onSelectAllClick: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  order: Order;
-  orderBy: string;
-  rowCount: number;
-}
-
-function EnhancedTableHead(props: EnhancedTableProps) {
-  const {
-    onSelectAllClick,
-    order,
-    orderBy,
-    numSelected,
-    rowCount,
-    onRequestSort,
-  } = props;
-  const createSortHandler =
-    (property: keyof Data) => (event: React.MouseEvent<unknown>) => {
-      onRequestSort(event, property);
-    };
-
-  return (
-    <thead>
-      <tr>
-        <th>
-          {/* <Checkbox
-            indeterminate={numSelected > 0 && numSelected < rowCount}
-            checked={rowCount > 0 && numSelected === rowCount}
-            onChange={onSelectAllClick}
-            slotProps={{
-              input: {
-                "aria-label": "select all desserts",
-              },
-            }}
-            sx={{ verticalAlign: "sub" }}
-          /> */}
-        </th>
-        {headCells.map((headCell) => {
-          const active = orderBy === headCell.id;
-
-          return (
-            <th
-              // key={headCell.id}
-              key="Desser"
-              aria-sort={
-                active
-                  ? ({ asc: "ascending", desc: "descending" } as const)[order]
-                  : undefined
-              }
-            >
-              {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-              <Link
-                underline="none"
-                color="neutral"
-                textColor={active ? "primary.plainColor" : undefined}
-                component="button"
-                onClick={createSortHandler(headCell.id)}
-                fontWeight="lg"
-                startDecorator={
-                  headCell.numeric ? (
-                    <ArrowDownwardIcon sx={{ opacity: active ? 1 : 0 }} />
-                  ) : null
-                }
-                endDecorator={
-                  !headCell.numeric ? (
-                    <ArrowDownwardIcon sx={{ opacity: active ? 1 : 0 }} />
-                  ) : null
-                }
-                sx={{
-                  "& svg": {
-                    transition: "0.2s",
-                    transform:
-                      active && order === "desc"
-                        ? "rotate(0deg)"
-                        : "rotate(180deg)",
-                  },
-                  "&:hover": { "& svg": { opacity: 1 } },
-                }}
-              >
-                {headCell.label}
-                {active ? (
-                  <Box component="span" sx={visuallyHidden}>
-                    {order === "desc"
-                      ? "sorted descending"
-                      : "sorted ascending"}
-                  </Box>
-                ) : null}
-              </Link>
-            </th>
-          );
-        })}
-      </tr>
-    </thead>
-  );
-}
-
-interface EnhancedTableToolbarProps {
-  numSelected: number;
-}
-
-function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
-  const { numSelected } = props;
-
-  return (
-    // <Box
-    //   sx={{
-    //     display: "flex",
-    //     alignItems: "center",
-    //     py: 1,
-    //     pl: { sm: 2 },
-    //     pr: { xs: 1, sm: 1 },
-    //     ...(numSelected > 0 && {
-    //       bgcolor: "background.level1",
-    //     }),
-    //     borderTopLeftRadius: "var(--unstable_actionRadius)",
-    //     borderTopRightRadius: "var(--unstable_actionRadius)",
-    //   }}
-    // >
-    //   {numSelected > 0 ? (
-    //     <Typography sx={{ flex: "1 1 100%" }} component="div">
-    //       {numSelected} selected
-    //     </Typography>
-    //   ) : (
-    //     <Typography
-    //       level="body-lg"
-    //       sx={{ flex: "1 1 100%" }}
-    //       id="tableTitle"
-    //       component="div"
-    //     >
-    //        Nutrition
-    //     </Typography>
-    //   )}
-
-    //   {numSelected > 0 ? (
-    //     <Tooltip title="Delete">
-    //       <IconButton size="sm" color="danger" variant="solid">
-    //         <DeleteIcon />
-    //       </IconButton>
-    //     </Tooltip>
-    //   ) : (
-    //     <Tooltip title="Filter list">
-    //       <IconButton size="sm" variant="outlined" color="neutral">
-    //         <FilterListIcon />
-    //       </IconButton>
-    //     </Tooltip>
-    //   )}
-    // </Box>
-    <></>
-  );
-}
-// b
 
 export default function C() {
-  // c
-  const [order, setOrder] = React.useState<Order>("asc");
-  const [orderBy, setOrderBy] = React.useState<keyof Data>("calories");
-  const [selected, setSelected] = React.useState<readonly string[]>([]);
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
-
-  const handleRequestSort = (
-    event: React.MouseEvent<unknown>,
-    property: keyof Data
-  ) => {
-    const isAsc = orderBy === property && order === "asc";
-    setOrder(isAsc ? "desc" : "asc");
-    setOrderBy(property);
-  };
-
-  const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.checked) {
-      const newSelected = rows.map((n) => n.name);
-      setSelected(newSelected);
-      return;
-    }
-    setSelected([]);
-  };
-
-  const handleClick = (event: React.MouseEvent<unknown>, name: string) => {
-    const selectedIndex = selected.indexOf(name);
-    let newSelected: readonly string[] = [];
-
-    // if (selectedIndex === -1) {
-    //   newSelected = newSelected.concat(selected, name);
-    // } else if (selectedIndex === 0) {
-    //   newSelected = newSelected.concat(selected.slice(1));
-    // } else if (selectedIndex === selected.length - 1) {
-    //   newSelected = newSelected.concat(selected.slice(0, -1));
-    // } else if (selectedIndex > 0) {
-    //   newSelected = newSelected.concat(
-    //     selected.slice(0, selectedIndex),
-    //     selected.slice(selectedIndex + 1)
-    //   );
-    // }
-
-    setSelected(newSelected);
-  };
-
-  const handleChangePage = (newPage: number) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event: any, newValue: number | null) => {
-    setRowsPerPage(parseInt(newValue!.toString(), 10));
-    setPage(0);
-  };
-
-  const getLabelDisplayedRowsTo = () => {
-    if (rows.length === -1) {
-      return (page + 1) * rowsPerPage;
-    }
-    return rowsPerPage === -1
-      ? rows.length
-      : Math.min(rows.length, (page + 1) * rowsPerPage);
-  };
-
-  const isSelected = (name: string) => selected.indexOf(name) !== -1;
-
-  // Avoid a layout jump when reaching the last page with empty rows.
-  const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
-  // c
+  
 
   const [currency, setCurrency] = React.useState("usd");
   // const [selected, setSelected] = React.useState("");
@@ -408,9 +47,9 @@ export default function C() {
 
         <Typography level="body-lg">
           Sell Monero from other users using any payment method and currency{" "}
-          <Link sx={{ m: 5 }} href="#basics">
+          <JoyLink sx={{ m: 5 }} href="#basics">
             How to start?{" "}
-          </Link>
+          </JoyLink>
           <Button size="sm">Create offer</Button>
         </Typography>
         <Sheet
@@ -519,7 +158,7 @@ export default function C() {
               </Select>
             </Grid>
             <Grid xs={1}>
-            <Link href="/offers/sell">
+            <Link href="/offers/sell/select">
               <Button variant="outlined" color="neutral">Clear all </Button>
               </Link>
             </Grid>
@@ -686,7 +325,7 @@ export default function C() {
             </tfoot>
           </Table> */}
           {/*  */}
-          <Link href="/offers/sell/select">
+          <Link href="/offers/sell/">
           <Table hoverRow>
             <thead>
               <tr>
@@ -763,190 +402,81 @@ export default function C() {
                       </Typography>
                     </td>
                     <td>
-                      <Box
-                        sx={{
-                          display: "flex",
-                          mt: 2,
-                          gap: 1,
-                          alignItems: "center",
-                        }}
-                      >
-                        <div>
-                          <RadioGroup
-                            name="best-movie"
-                            aria-labelledby="best-movie"
-                            orientation="horizontal"
-                            sx={{ flexWrap: "wrap", gap: 1 }}
-                          >
-                            {[
-                              "Binance Coin (BNB)",
-                           
-                            ].map((name) => {
-                              // const checked = selected0 === name;
-                              return (
-                                <>
-                                  <Chip
-                                    style={{ size: "1rem" }}
-                                    key={name}
-                                    // variant="plain"
-                                   
-                                    startDecorator={  <Avatar size="sm" src={option.PaymentMethod1Avatar} />}
-                                    // startDecorator={
-                                    //   checked && <CheckIcon sx={{ zIndex: 1, pointerEvents: 'none' }} />
-                                    // }
-                                  >
-                                    <Radio
-                                                
-                                      variant="outlined"
-                                      
-                                      color={option.ColorPaymentMethord1}
-                                      disableIcon
-                                      overlay
-                                      label={option.PaymentMethod1}
-                                      value={name}
-
-                                      // onChange={(event) => {
-                                      //   if (event.target.checked) {
-                                      //     setSelected0(name);
-                                      //   }
-                                      // }}
-                                    />
-                                  </Chip>
-                                  <Chip
-                                    style={{ size: "1rem" }}
-                                    key={name}
-                                    startDecorator={<Avatar size="sm" src={option.PaymentMethod2Avatar} />}
-                                    variant="plain"
-                                    //  color={checked ? "primary" : "neutral"}
-                                    // startDecorator={
-                                    //   checked && <CheckIcon sx={{ zIndex: 1, pointerEvents: 'none' }} />
-                                    // }
-                                  >
-                                    <Radio
-                                      variant="outlined"
-                                      //  color={checked ? "primary" : "neutral"}
-                                      disableIcon
-                                      overlay
-                                      color={option.ColorPaymentMethord2}
-                                      label={option.PaymentMethod2}
-                                      value={name}
-                                      //  checked={checked}
-                                      //  onChange={(event) => {
-                                      //    if (event.target.checked) {
-                                      //      setSelected0(name);
-                                      //    }
-                                      //  }}
-                                    />
-                                  </Chip>
-                                  <Chip
-                                    style={{ size: "1rem" }}
-                                    key={name}
-                                    startDecorator={<Avatar size="sm" src={option.PaymentMethod3Avatar} />}
-                                    variant="plain"
-                                    //  color={checked ? "primary" : "neutral"}
-                                    // startDecorator={
-                                    //   checked && <CheckIcon sx={{ zIndex: 1, pointerEvents: 'none' }} />
-                                    // }
-                                  >
-                                    <Radio
-                                      variant="outlined"
-                                      //  color={checked ? "primary" : "neutral"}
-                                      disableIcon
-                                      overlay
-                                      color={option.ColorPaymentMethord3}
-                                      label={option.PaymentMethod3}
-                                      value={name}
-                                      //  checked={checked}
-                                      //  onChange={(event) => {
-                                      //    if (event.target.checked) {
-                                      //      setSelected0(name);
-                                      //    }
-                                      //  }}
-                                    />
-                                  </Chip>
-                                  <Chip
-                                    style={{ size: "1rem" }}
-                                    key={name}
-                                    variant="plain"
-                                    startDecorator={<Avatar size="sm" src={option.PaymentMethod4Avatar} />}
-                                    //  color={checked ? "primary" : "neutral"}
-                                    // startDecorator={
-                                    //   checked && <CheckIcon sx={{ zIndex: 1, pointerEvents: 'none' }} />
-                                    // }
-                                  >
-                                    <Radio
-                                      variant="outlined"
-                                      //  color={checked ? "primary" : "neutral"}
-                                      disableIcon
-                                      overlay
-                                      label={option.PaymentMethod4}
-                                      color={option.ColorPaymentMethord4}
-                                      value={name}
-                                      //  checked={checked}
-                                      //  onChange={(event) => {
-                                      //    if (event.target.checked) {
-                                      //      setSelected0(name);
-                                      //    }
-                                      //  }}
-                                    />
-                                  </Chip>
-                                  <Chip
-                                    style={{ size: "1rem" }}
-                                    key={name}
-                                    variant="plain"
-                                    startDecorator={<Avatar size="sm" src={option.PaymentMethod5Avatar} />}
-                                    //  color={checked ? "primary" : "neutral"}
-                                    // startDecorator={
-                                    //   checked && <CheckIcon sx={{ zIndex: 1, pointerEvents: 'none' }} />
-                                    // }
-                                  >
-                                    <Radio
-                                      variant="outlined"
-                                      //  color={checked ? "primary" : "neutral"}
-                                      disableIcon
-                                      overlay
-                                      label={option.PaymentMethod5}
-                                      color={option.ColorPaymentMethord5}
-                                      value={name}
-                                      //  checked={checked}
-                                      //  onChange={(event) => {
-                                      //    if (event.target.checked) {
-                                      //      setSelected0(name);
-                                      //    }
-                                      //  }}
-                                    />
-                                  </Chip>
-                                  <Chip
-                                    style={{ size: "1rem" }}
-                                    key={name}
-                                    variant="plain"
-                                    //  color={checked ? "primary" : "neutral"}
-                                    // startDecorator={
-                                    //   checked && <CheckIcon sx={{ zIndex: 1, pointerEvents: 'none' }} />
-                                    // }
-                                  >
-                                    <Radio
-                                      variant="outlined"
-                                      //  color={checked ? "primary" : "neutral"}
-                                      disableIcon
-                                      overlay
-                                      label={option.PaymentMethodsNo}
-                                      color={option.ColorPaymentMethordsNo}
-                                      value={name}
-                                      //  checked={checked}
-                                      //  onChange={(event) => {
-                                      //    if (event.target.checked) {
-                                      //      setSelected0(name);
-                                      //    }
-                                      //  }}
-                                    />
-                                  </Chip>
-                                </>
-                              );
-                            })}
-                          </RadioGroup>
-                        </div>
-                      </Box>
+                    <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+      <div>
+        <Chip
+          variant="outlined"
+          // color={option.ColorPaymentMethord1}
+          size="lg"
+          sx={{ m: 0.5 }}
+          startDecorator={
+            <Avatar size="sm" src={option.PaymentMethod1Avatar} />
+          }
+          onClick={() => console.log("hello")}
+        >
+          {option.PaymentMethod1}
+        </Chip>
+        <Chip
+          variant="outlined"
+          // color={option.ColorPaymentMethord2}
+          size="lg"
+          sx={{ m: 0.5 }}
+          startDecorator={
+            <Avatar size="sm" src={option.PaymentMethod2Avatar} />
+          }
+          onClick={() => console.log("hello")}
+        >
+          {option.PaymentMethod2}
+        </Chip>
+        <Chip
+          variant="outlined"
+          // color={option.ColorPaymentMethord3}
+          size="lg"
+          sx={{ m: 0.5 }}
+          startDecorator={
+            <Avatar size="sm" src={option.PaymentMethod3Avatar} />
+          }
+          onClick={() => console.log("hello")}
+        >
+          {option.PaymentMethod3}
+        </Chip>
+        <Chip
+          variant="outlined"
+          // color={option.ColorPaymentMethord4}
+          size="lg"
+          sx={{ m: 0.5 }}
+          startDecorator={
+            <Avatar size="sm" src={option.PaymentMethod4Avatar} />
+          }
+          onClick={() => console.log("hello")}
+        >
+          {option.PaymentMethod4}
+        </Chip>
+        <Chip
+          variant="outlined"
+          // color={option.ColorPaymentMethord5}
+          size="lg"
+          sx={{ m: 0.5 }}
+          startDecorator={
+            <Avatar size="sm" src={option.PaymentMethod5Avatar} />
+          }
+          onClick={() => console.log("hello")}
+        >
+          {option.PaymentMethod5}
+        </Chip>
+        <Chip
+          variant="outlined"
+          // color={option.ColorPaymentMethordsNo}
+          size="lg"
+          sx={{ m: 0.5 }}
+          onClick={() => console.log("hello")}
+        >
+          {option.PaymentMethodsNo}
+        </Chip>
+      
+      </div>
+    </Box>
+                      
                     </td>
                     <td>
                       {" "}
@@ -1628,7 +1158,7 @@ PaymentMethod3: "Bitcoin Cash",
 PaymentMethod4: "Tether",
 PaymentMethod5: "Binance USD",
 PaymentMethodsNo: "+9",
-ColorPaymentMethord1:"warning",
+ColorPaymentMethord1: "warning",
 ColorPaymentMethord2:"primary",
 ColorPaymentMethord3:"warning",
 ColorPaymentMethord4:"success",

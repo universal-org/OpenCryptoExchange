@@ -16,7 +16,7 @@ import Tooltip from "@mui/joy/Tooltip";
 import Stepper from "@mui/joy/Stepper";
 import Step from "@mui/joy/Step";
 import Footer from "../footer";
-import MyMessages from "./components/MyMessages";
+import MyMessages from "./chatbox/MyMessages";
 
 export default function C() {
   const [selected, setSelected] = React.useState<readonly string[]>([]);
@@ -29,8 +29,8 @@ export default function C() {
   
   const [selected0, setSelected0] = React.useState("");
   
-  const [size, setSize] = React.useState<ModalDialogProps['size'] | undefined>(
-    undefined,
+  const [size, setSize] = React.useState<ModalDialogProps['size'] | null>(
+    null,
   );
   const [italic, setItalic] = React.useState(false);
   const [fontWeight, setFontWeight] = React.useState('normal');
@@ -156,7 +156,7 @@ export default function C() {
                           Payment method{" "}
                           <Chip
                             variant="outlined"
-                            color={option.ColorPaymentMethodSelected}
+                            // color={option.ColorPaymentMethodSelected}
                           >
                             {option.PaymentMethodSelected}
                           </Chip>
@@ -224,7 +224,7 @@ export default function C() {
           color="neutral"
           //  sx={{ p: 4 }}
         >
-          <Typography level="title-xs">You have successfully received your payment.</Typography>
+          <Typography level="title-sm">You have successfully received your payment.</Typography>
               <Typography level="body-md">The Contract has been Completed. <br/>Thanks for choosing us !</Typography>
           
 

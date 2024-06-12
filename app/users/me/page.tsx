@@ -3,23 +3,22 @@ import { CssVarsProvider } from '@mui/joy/styles';
 import CssBaseline from '@mui/joy/CssBaseline';
 import Box from '@mui/joy/Box';
 import Sidebar from '../../components/users/SideBar';
-// import Header from './components/Header';
 import MyProfile from '../../components/users/account';
-export const metadata = {
-    title: "Account",
-    description: "Open Source Crypto Exchange Platform with Zero Transaction Fees.",
-  };
+import type { Metadata } from 'next'
+ 
+export const metadata: Metadata = {
+  title: 'Account',
+  description: 'Open Source Crypto Exchange Platform with Zero Transaction Fees.',
+}
 export default function JoyOrderDashboardTemplate() {
   return (
     <CssVarsProvider disableTransitionOnChange>
       <CssBaseline />
       <Box 
       sx={{ display: 'flex',
-        //  minHeight: '100dvh' 
         }}
       >
          <Sidebar />
-        {/*<Header /> */}
         <Box
           component="main"
           className="MainContent"

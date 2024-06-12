@@ -1,5 +1,6 @@
 "use client"
 import * as React from 'react';
+import NextLink from 'next/link'
 import { CssVarsProvider, useColorScheme } from '@mui/joy/styles';
 import GlobalStyles from '@mui/joy/GlobalStyles';
 import CssBaseline from '@mui/joy/CssBaseline';
@@ -16,7 +17,6 @@ import Typography from '@mui/joy/Typography';
 import Stack from '@mui/joy/Stack';
 import DarkModeRoundedIcon from '@mui/icons-material/DarkModeRounded';
 import LightModeRoundedIcon from '@mui/icons-material/LightModeRounded';
-import BadgeRoundedIcon from '@mui/icons-material/BadgeRounded';
 import GoogleIcon from './GoogleIcon';
 
 interface FormElements extends HTMLFormControlsCollection {
@@ -134,10 +134,13 @@ export default function JoySignInSideTemplate() {
                   Sign in
                 </Typography>
                 <Typography level="body-sm">
-                  New to company?{' '}
+                  already registered?{' '}
+                  <NextLink href="/login">
+
                   <Link href="#replace-with-a-link" level="title-sm">
-                    Sign up!
+                    Log in
                   </Link>
+                  </NextLink>
                 </Typography>
               </Stack>
               <Button
@@ -188,9 +191,7 @@ export default function JoySignInSideTemplate() {
                     }}
                   >
                     <Checkbox size="sm" label="Remember me" name="persistent" />
-                    <Link level="title-sm" href="#replace-with-a-link">
-                      Forgot your password?
-                    </Link>
+                
                   </Box>
                   <Button type="submit" fullWidth>
                     Sign in

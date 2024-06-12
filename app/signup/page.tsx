@@ -1,15 +1,14 @@
-import Grid from "./components/grid";
+import SignUp from "../components/signup/page";
 import type { Metadata } from 'next'
  
 export const metadata: Metadata = {
-  title: 'Open Crypto Exchange',
+  title: 'SignUp',
   description: 'Open Source Crypto Exchange Platform with Zero Transaction Fees.',
 }
-
 export default function C() {
   return (
     <>
-      <Grid />
+      <SignUp />
     </>
   );
 }

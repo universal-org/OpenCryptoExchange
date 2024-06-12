@@ -26,7 +26,7 @@ import { styled } from "@mui/joy/styles";
 import Stepper from "@mui/joy/Stepper";
 import Step from "@mui/joy/Step";
 import Footer from "../footer";
-import MyMessages from "./components/MyMessages";
+import MyMessages from "./chatbox/MyMessages";
 import RejectButton from "./RejectButton"
 export default function C() {
   const [open, setOpen] = React.useState<boolean>(false);
@@ -36,8 +36,8 @@ export default function C() {
   
   const [selected0, setSelected0] = React.useState("");
   
-  const [size, setSize] = React.useState<ModalDialogProps['size'] | undefined>(
-    undefined,
+  const [size, setSize] = React.useState<ModalDialogProps['size'] | null>(
+    null,
   );
   const [italic, setItalic] = React.useState(false);
   const [fontWeight, setFontWeight] = React.useState('normal');
@@ -164,7 +164,7 @@ export default function C() {
                           Payment method{" "}
                           <Chip
                             variant="outlined"
-                            color={option.ColorPaymentMethodSelected}
+                            // color={option.ColorPaymentMethodSelected}
                           >
                             {option.PaymentMethodSelected}
                           </Chip>
@@ -232,7 +232,7 @@ export default function C() {
           color="neutral"
           //  sx={{ p: 4 }}
         >
-          <Typography level="title-xs">Engaging in contract</Typography>
+          <Typography level="title-sm">Engaging in contract</Typography>
               <Typography level="body-md">Generate a multisig escrow address by confirming your payment password.</Typography>
           
 
